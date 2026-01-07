@@ -1,11 +1,16 @@
 'use client'
 
-import { LayoutDashboard, ShoppingBag, Users, Menu, LogOut, Coffee } from 'lucide-react'
+import { LayoutDashboard, ShoppingBag, Users, Menu, LogOut, Coffee, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { notFound } from 'next/navigation'
+import { useAuth } from '@/components/auth/AuthProvider'
+import { useRouter } from 'next/navigation'
 
 export default function StaffLayout({ children }: { children: React.ReactNode }) {
     const pathname = usePathname()
+    const { user, loading, signOut } = useAuth()
+    const router = useRouter()
 
     const navItems = [
         { name: 'KDS Board', href: '/staff/dashboard', icon: LayoutDashboard },
@@ -13,6 +18,28 @@ export default function StaffLayout({ children }: { children: React.ReactNode })
         { name: 'Sales Report', href: '/staff/sales', icon: ShoppingBag },
         { name: 'Social Admin', href: '/staff/admin', icon: Users },
     ]
+
+    // Show loading state while checking auth
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+                <div className="text-center">
+                    <Loader2 className="animate-spin mx-auto mb-4" size={48} />
+                    <p className="text-gray-600 uppercase tracking-widest text-sm">Loading...</p>
+                </div>
+            </div>
+        )
+    }
+
+    // Return 404 if not authenticated
+    if (!user) {
+        notFound()
+    }
+
+    const handleLogout = async () => {
+        await signOut()
+        router.push('/auth/login')
+    }
 
     return (
         <div className="min-h-screen bg-gray-100 font-sans text-black">
@@ -28,9 +55,13 @@ export default function StaffLayout({ children }: { children: React.ReactNode })
                 <div className="flex items-center gap-4">
                     <div className="text-right hidden md:block">
                         <p className="text-xs text-gray-400 uppercase tracking-widest">Logged in as</p>
-                        <p className="font-bold">STAFF USER</p>
+                        <p className="font-bold truncate max-w-[200px]">{user.email}</p>
                     </div>
-                    <button className="bg-red-600 hover:bg-red-700 text-white p-2 rounded-sm transition-colors" title="Log Out">
+                    <button
+                        onClick={handleLogout}
+                        className="bg-red-600 hover:bg-red-700 text-white p-2 rounded-sm transition-colors"
+                        title="Log Out"
+                    >
                         <LogOut size={20} />
                     </button>
                 </div>
@@ -47,8 +78,8 @@ export default function StaffLayout({ children }: { children: React.ReactNode })
                                     key={item.href}
                                     href={item.href}
                                     className={`flex items-center gap-3 px-4 py-3 font-bold transition-all border-2 ${isActive
-                                            ? 'bg-black text-white border-black translate-x-1 shadow-[4px_4px_0px_0px_rgba(100,100,100,1)]'
-                                            : 'bg-white text-gray-600 border-transparent hover:border-gray-200 hover:bg-gray-50'
+                                        ? 'bg-black text-white border-black translate-x-1 shadow-[4px_4px_0px_0px_rgba(100,100,100,1)]'
+                                        : 'bg-white text-gray-600 border-transparent hover:border-gray-200 hover:bg-gray-50'
                                         }`}
                                 >
                                     <item.icon size={20} />
