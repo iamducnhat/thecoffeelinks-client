@@ -30,13 +30,10 @@ export default function RootLayout({
         className={cn(
           geistSans.variable,
           geistMono.variable,
-          "antialiased min-h-screen bg-cream text-moss"
+          "antialiased min-h-screen"
         )}
       >
-        <main className="max-w-md mx-auto min-h-screen bg-white/50 shadow-2xl overflow-hidden relative">
-          {/* Mobile Container Simulation */}
-          {children}
-        </main>
+        {children}
       </body>
     </html>
   );

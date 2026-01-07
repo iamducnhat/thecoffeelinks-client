@@ -29,7 +29,8 @@ export default function CartPage() {
     const handleCheckout = async () => {
         setIsCheckingOut(true);
         try {
-            const res = await fetch('/api/orders/create', {
+            const apiUrl = process.env.NEXT_PUBLIC_API_URL || '';
+            const res = await fetch(`${apiUrl}/api/orders/create`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
